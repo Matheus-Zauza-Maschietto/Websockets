@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>WebSocket Echo</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+</head>
+
+<body>
+    <h2>WebSocket Chat</h2>
+    <textarea id="chat" cols="60" rows="20" readonly></textarea><br>
+    <input type="text" id="message" placeholder="Type your message..." onkeypress="sendWriting()" />
+    <button onclick="sendMessage()">Send</button>
+    <button onclick="closeMessage()">Close</button>
+    <script>
+        const socket = new signalR.HubConnectionBuilder()
+            .withUrl("http://localhost:3000/chathub")
+            .build();
+        socket.start().catch(err => console.error(err.toString()));
+
+        const chat = document.getElementById("chat");
+
+        socket.on("message", function (data) {
+            chat.value += data + "\n";
+        });
+
+        socket.on("writing", function (data) {
+            createUserWritingAlert(data);
+        });
+
+        function createUserWritingAlert(data) {
+            const writingAlert = document.createElement("div");
+            writingAlert.innerText = data;
+            writingAlert.style.color = "blue";
+            writingAlert.style.fontStyle = "italic";
+            writingAlert.style.fontSize = "12px";
+            writingAlert.style.marginTop = "5px";
+            writingAlert.style.marginBottom = "5px";
+            writingAlert.id = "writingAlert";
+            document.querySelector("body").appendChild(writingAlert);
+            setTimeout(() => {
+                document.querySelector("body").removeChild(writingAlert);
+            }, 3000);
+        }
+
+
+        function sendMessage() {
+            const msg = document.getElementById("message").value;
+            socket.invoke("message", '', msg).catch(function (err) {
+                return console.error(err.toString());
+            });
+
+            document.getElementById("message").value = '';
+        }
+
+        function sendWriting() {
+            const msg = document.getElementById("message").value;
+            socket.invoke("writing", '', 'msg').catch(function (err) {
+                return console.error(err.toString());
+            });
+        }
+
+
+
+    </script>
+</body>
+
+</html>
