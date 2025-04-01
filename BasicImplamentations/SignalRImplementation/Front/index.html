@@ -6,7 +6,6 @@
     <title>WebSocket Echo</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
     <style>
-        /* Centralize the entire chat app */
         .chat-app {
             max-width: 600px;
             margin: 40px auto;
@@ -26,11 +25,6 @@
             color: #0277bd;
             margin-bottom: 20px;
         }
-        /* Hide the original textarea */
-        #chat {
-            display: none;
-        }
-        /* New chat container for balloon messages */
         #chatContainer {
             height: 300px;
             overflow-y: auto;
@@ -41,7 +35,6 @@
             text-align: left;
             margin-bottom: 15px;
         }
-        /* Balloon message styling */
         .bubble {
             max-width: 70%;
             padding: 10px 15px;
@@ -51,21 +44,18 @@
             clear: both;
             word-wrap: break-word;
         }
-        /* Incoming messages (from server) */
         .incoming {
             background-color: #ffffff;
             border: 1px solid #0277bd;
             float: left;
             border-bottom-left-radius: 0;
         }
-        /* Outgoing messages (sent by user) */
         .outgoing {
             background-color: #0277bd;
             color: #fff;
             float: right;
             border-bottom-right-radius: 0;
         }
-        /* Input and button styles */
         .input-section {
             margin-top: 10px;
         }
@@ -97,18 +87,15 @@
         
         <div id="chatContainer"></div>
         
-        <textarea id="chat" cols="60" rows="20" readonly></textarea><br>
-        
         <div class="input-section">
             <input type="text" id="message" placeholder="Type your message..." onkeypress="sendWriting()" />
             <button onclick="sendMessage()">Send</button>
-            <button onclick="closeMessage()">Close</button>
         </div>
     </div>
     
     <script>
         const socket = new signalR.HubConnectionBuilder()
-            .withUrl("http://localhost:3000/chathub")
+            .withUrl("http://localhost:3000/chathub", { withCredentials: true })
             .build();
             
         socket.start().catch(err => console.error(err.toString()));
@@ -157,15 +144,11 @@
         }
 
         function sendWriting() {
-            const msg = document.getElementById("message").value;
             socket.invoke("writing", '', msg).catch(function (err) {
                 return console.error(err.toString());
             });
         }
 
-        function closeMessage() {
-            document.getElementById("chatContainer").innerHTML = "";
-        }
     </script>
 </body>
 

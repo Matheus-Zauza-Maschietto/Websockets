@@ -2,18 +2,18 @@ using ChatForumSignalR;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddOpenApi();
-builder.Services.AddSignalR();
 builder.Services.AddCors(options =>
 {
-    options.AddDefaultPolicy(policy =>
+    options.AddPolicy("CorsPolicy", builder =>
     {
-        policy.WithOrigins("http://127.0.0.1:5500")
-            .AllowAnyHeader()
-            .AllowAnyMethod()
-            .AllowCredentials();
+        builder.WithOrigins("http://localhost:5500")
+               .AllowAnyHeader()
+               .AllowAnyMethod()
+               .AllowCredentials();
     });
 });
+builder.Services.AddOpenApi();
+builder.Services.AddSignalR();
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -21,7 +21,7 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-app.UseHttpsRedirection();
-app.UseCors();
+//app.UseHttpsRedirection();
 app.MapHub<ChatHub>("/chathub");
+app.UseCors("CorsPolicy");
 app.Run();
